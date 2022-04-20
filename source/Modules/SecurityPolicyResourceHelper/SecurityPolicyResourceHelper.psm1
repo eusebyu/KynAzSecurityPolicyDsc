@@ -653,3 +653,57 @@ function ConvertTo-SDDLDescriptor
 
     return $result
 }
+
+<#
+    .SYNOPSIS
+        Checks for policy deviations in a JSON configuration file.
+
+    .PARAMETER URL
+        The URL link used to download the JSON configuration file containing the deviations.
+
+    .PARAMETER PolicyType
+        The type of the policy to get deviations for.
+
+    .PARAMETER Policy
+        The name of the policy to get deviations for.
+#>
+function Get-OSHardeningDeviations {
+    Param (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $URL,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet(
+            "AccountPolicy",
+            "SecurityOption",
+            "UserRightsAssignment"
+        )]
+        [System.String]
+        $PolicyType,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Policy
+    )
+
+    $UUID = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
+    if ($null -eq $UUID) {
+        Throw "Failed to get the unique identifier from the local machine."
+    }
+
+    try {
+        $deviations = [System.Net.WebClient]::new().DownloadString($URL) | ConvertFrom-Json -ErrorAction Stop
+    }
+    catch {
+        Throw "Failed to download the deviation file from '$URL' with error: ${$_.Exception.Message}"
+    }
+
+    if ($UUID -in $deviations.PSObject.Properties.Name) {
+        if ($PolicyType -in $deviations.$UUID.PSObject.Properties.Name) {
+            if ($Policy -in $deviations.$UUID.$PolicyType.PSObject.Properties.Name) {
+                return $deviations.$UUID.$PolicyType.$Policy
+            }
+        }
+    }
+}
