@@ -671,7 +671,7 @@ function Get-OSHardeningDeviations {
     Param (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $URL,
+        $DeviationUrl,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet(
@@ -693,10 +693,10 @@ function Get-OSHardeningDeviations {
     }
 
     try {
-        $deviations = [System.Net.WebClient]::new().DownloadString($URL) | ConvertFrom-Json -ErrorAction Stop
+        $deviations = [System.Net.WebClient]::new().DownloadString($DeviationUrl) | ConvertFrom-Json -ErrorAction Stop
     }
     catch {
-        Throw "Failed to download the deviation file from '$URL' with error: ${$_.Exception.Message}"
+        Throw "Failed to download the deviation file from '$DeviationUrl' with error: ${$_.Exception.Message}"
     }
 
     if ($UUID -in $deviations.PSObject.Properties.Name) {

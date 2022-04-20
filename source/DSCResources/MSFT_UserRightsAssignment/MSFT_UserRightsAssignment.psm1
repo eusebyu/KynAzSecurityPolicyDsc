@@ -79,6 +79,10 @@ function Get-TargetResource
         $Identity,
 
         [Parameter()]
+        [System.String]
+        $DeviationUrl,
+
+        [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
         $Ensure = "Present",
@@ -169,6 +173,10 @@ function Set-TargetResource
         $Identity,
 
         [Parameter()]
+        [System.String]
+        $DeviationUrl,
+
+        [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
         $Ensure = "Present",
@@ -177,6 +185,11 @@ function Set-TargetResource
         [System.Boolean]
         $Force = $false
     )
+
+    $deviation = Get-OSHardeningDeviations -DeviationUrl $DeviationUrl -PolicyType UserRightsAssignment -Policy $Policy
+    if ($null -ne $deviation) {
+        $Identity = [System.String[]] $deviation
+    }
 
     $userRightConstant = Get-UserRightConstant -Policy $Policy
 
@@ -341,6 +354,10 @@ function Test-TargetResource
         $Identity,
 
         [Parameter()]
+        [System.String]
+        $DeviationUrl,
+
+        [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
         $Ensure = "Present",
@@ -349,6 +366,11 @@ function Test-TargetResource
         [System.Boolean]
         $Force
     )
+
+    $deviation = Get-OSHardeningDeviations -DeviationUrl $DeviationUrl -PolicyType UserRightsAssignment -Policy $Policy
+    if ($null -ne $deviation) {
+        $Identity = [System.String[]] $deviation
+    }
 
     $currentUserRights = Get-UserRightPolicy -Name $Policy
 
