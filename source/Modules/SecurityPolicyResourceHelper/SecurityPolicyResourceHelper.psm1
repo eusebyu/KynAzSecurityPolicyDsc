@@ -197,9 +197,9 @@ function Get-SecurityPolicy
     .PARAMETER FilePath
         Path to an INF file
     .EXAMPLE
-        Get-UserRightsAssignment -FilePath C:\seceditOutput.inf
+        Get-AzUserRightsAssignment -FilePath C:\seceditOutput.inf
 #>
-function Get-UserRightsAssignment
+function Get-AzUserRightsAssignment
 {
     [OutputType([Hashtable])]
     [CmdletBinding()]
@@ -658,7 +658,7 @@ function ConvertTo-SDDLDescriptor
     .SYNOPSIS
         Checks for policy deviations in a JSON configuration file.
 
-    .PARAMETER URL
+    .PARAMETER Url
         The URL link used to download the JSON configuration file containing the deviations.
 
     .PARAMETER PolicyType
@@ -667,17 +667,17 @@ function ConvertTo-SDDLDescriptor
     .PARAMETER Policy
         The name of the policy to get deviations for.
 #>
-function Get-OSHardeningDeviations {
+function Get-Deviation {
     Param (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $DeviationUrl,
+        $Url,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet(
             "AccountPolicy",
             "SecurityOption",
-            "UserRightsAssignment"
+            "AzUserRightsAssignment"
         )]
         [System.String]
         $PolicyType,
@@ -693,10 +693,10 @@ function Get-OSHardeningDeviations {
     }
 
     try {
-        $deviations = [System.Net.WebClient]::new().DownloadString($DeviationUrl) | ConvertFrom-Json -ErrorAction Stop
+        $deviations = [System.Net.WebClient]::new().DownloadString($Url) | ConvertFrom-Json -ErrorAction Stop
     }
     catch {
-        Throw "Failed to download the deviation file from '$DeviationUrl' with error: ${$_.Exception.Message}"
+        Throw "Failed to download the deviation file from '$Url' with error: ${$_.Exception.Message}"
     }
 
     if ($UUID -in $deviations.PSObject.Properties.Name) {

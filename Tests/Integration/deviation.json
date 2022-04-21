@@ -1,0 +1,9 @@
+{
+    "92EE484C-211A-11B2-A85C-AAA1E8E547EE": {
+        "AzUserRightsAssignment": {
+            "Shut_down_the_system": ["Administrators", "LOCAL SERVICE"],
+            "Impersonate_a_client_after_authentication": ["Administrators", "SERVICE"],
+            "Change_the_system_time": ["Administrators"]
+        }
+    }
+}

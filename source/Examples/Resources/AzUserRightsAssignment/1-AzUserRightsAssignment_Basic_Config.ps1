@@ -8,13 +8,13 @@
 .LICENSEURI https://github.com/dsccommunity/SecurityPolicyDsc/blob/master/LICENSE
 .PROJECTURI https://github.com/dsccommunity/SecurityPolicyDsc
 .ICONURI https://dsccommunity.org/images/DSC_Logo_300p.png
-.EXTERNALMODULEDEPENDENCIES 
+.EXTERNALMODULEDEPENDENCIES
 .REQUIREDSCRIPTS
 .EXTERNALSCRIPTDEPENDENCIES
 .RELEASENOTES
 Updated author, copyright notice, and URLs.
 .PRIVATEDATA
-#> 
+#>
 
 #Requires -Module SecurityPolicyDsc
 
@@ -29,21 +29,21 @@ Updated author, copyright notice, and URLs.
         the assignment without overwriting any pre-existing values, as the 'Force' parameter
         is not specified, and therefore defaults to $false.
 #>
-Configuration UserRightsAssignment_Basic_Config
+Configuration AzUserRightsAssignment_Basic_Config
 {
     Import-DscResource -ModuleName SecurityPolicyDsc
 
     Node localhost
     {
         # Assign shutdown privileges to only Builtin\Administrators
-        UserRightsAssignment AssignShutdownPrivilegesToAdmins
+        AzUserRightsAssignment AssignShutdownPrivilegesToAdmins
         {
             Policy   = "Shut_down_the_system"
             Identity = "Builtin\Administrators"
             Force    = $true
         }
 
-        UserRightsAssignment AccessComputerFromNetwork
+        AzUserRightsAssignment AccessComputerFromNetwork
         {
             Policy   = "Access_this_computer_from_the_network"
             Identity = "contoso\TestUser1", "contoso\TestUser2"

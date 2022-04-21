@@ -33,7 +33,7 @@ A full list of changes in each version can be found in the [change log](CHANGELO
 * **AccountPolicy**: Configures the policies under the Account Policy node in local security policies.
 * **SecurityOption**: Configures the policies under the Security Options node in local security policies.
 * **SecurityTemplate**: Configures user rights assignments that are defined in an INF file.
-* **UserRightsAssignment**: Configures user rights assignments in local security policies.
+* **AzUserRightsAssignment**: Configures user rights assignments in local security policies.
 
 ### AccountPolicy
 
@@ -173,7 +173,7 @@ A full list of changes in each version can be found in the [change log](CHANGELO
 | **IsSingleInstance** | Key | String | Specifies the resource is a single instance, the value must be 'Yes' |Yes|
 | **Path** | Required | String | The path to the desired security policy template (.inf) ||
 
-### UserRightsAssignment
+### AzUserRightsAssignment
 
 | Parameter | Attribute | DataType | Description | Allowed Values |
 | --- | --- | --- | --- | --- |

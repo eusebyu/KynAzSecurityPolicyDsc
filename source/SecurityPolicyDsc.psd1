@@ -82,7 +82,7 @@ AliasesToExport = @()
 
 # DSC resources to export from this module
 DscResourcesToExport = 'AccountPolicy', 'SecurityOption', 'SecurityTemplate',
-               'UserRightsAssignment'
+               'AzUserRightsAssignment'
 
 # List of all modules packaged with this module
 # ModuleList = @()

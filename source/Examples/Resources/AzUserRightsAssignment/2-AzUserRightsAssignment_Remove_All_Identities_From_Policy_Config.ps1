@@ -8,13 +8,13 @@
 .LICENSEURI https://github.com/dsccommunity/SecurityPolicyDsc/blob/master/LICENSE
 .PROJECTURI https://github.com/dsccommunity/SecurityPolicyDsc
 .ICONURI https://dsccommunity.org/images/DSC_Logo_300p.png
-.EXTERNALMODULEDEPENDENCIES 
+.EXTERNALMODULEDEPENDENCIES
 .REQUIREDSCRIPTS
 .EXTERNALSCRIPTDEPENDENCIES
 .RELEASENOTES
 Updated author, copyright notice, and URLs.
 .PRIVATEDATA
-#> 
+#>
 
 #Requires -Module SecurityPolicyDsc
 
@@ -23,13 +23,13 @@ Updated author, copyright notice, and URLs.
         This configuration will manage a User Rights Assignment policy.
         When Identity is an empty string all identities will be removed from the policy.
 #>
-Configuration UserRightsAssignment_Remove_All_Identities_From_Policy_Config
+Configuration AzUserRightsAssignment_Remove_All_Identities_From_Policy_Config
 {
     Import-DscResource -ModuleName SecurityPolicyDsc
 
     Node localhost
     {
-        UserRightsAssignment RemoveIdsFromSeTrustedCredManAccessPrivilege
+        AzUserRightsAssignment RemoveIdsFromSeTrustedCredManAccessPrivilege
         {
             Policy   = "Access_Credential_Manager_as_a_trusted_caller"
             Identity = ""

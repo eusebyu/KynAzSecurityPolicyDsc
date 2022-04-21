@@ -1,6 +1,6 @@
 
 $script:DSCModuleName   = 'SecurityPolicyDsc'
-$script:DSCResourceName = 'MSFT_UserRightsAssignment'
+$script:DSCResourceName = 'MSFT_AzUserRightsAssignment'
 
 #region HEADER
 try
@@ -44,7 +44,7 @@ try
         #endregion
 
         Context 'Verify Successful Configuration on Trusted Caller' {
-            Import-Module "$PSScriptRoot\..\..\DSCResources\MSFT_UserRightsAssignment\MSFT_UserRightsAssignment.psm1"
+            Import-Module "$PSScriptRoot\..\..\DSCResources\MSFT_AzUserRightsAssignment\MSFT_AzUserRightsAssignment.psm1"
             Import-Module "$PSScriptRoot\..\..\Modules\SecurityPolicyResourceHelper\SecurityPolicyResourceHelper.psm1"
             It 'Should have set the resource and all the parameters should match' {
                 $getResults = Get-TargetResource -Policy $rule.Policy -Identity $rule.Identity
@@ -73,7 +73,7 @@ try
         }
 
         Context 'Verify Guests removed from deny log on locally' {
-            Import-Module "$PSScriptRoot\..\..\DSCResources\MSFT_UserRightsAssignment\MSFT_UserRightsAssignment.psm1"
+            Import-Module "$PSScriptRoot\..\..\DSCResources\MSFT_AzUserRightsAssignment\MSFT_AzUserRightsAssignment.psm1"
             $getResults = Get-TargetResource -Policy $removeGuests.Policy -Identity $removeGuests.Identity
             $testResults = Test-TargetResource -Policy $removeGuests.Policy -Identity $removeGuests.Identity -Ensure 'Absent'
 

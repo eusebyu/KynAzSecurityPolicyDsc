@@ -5,7 +5,7 @@ Import-Module -Name (Join-Path -Path $modulesRootPath  `
               -Force
 
 
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_UserRightsAssignment'
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_AzUserRightsAssignment'
 
 <#
     .SYNOPSIS
@@ -186,9 +186,13 @@ function Set-TargetResource
         $Force = $false
     )
 
-    $deviation = Get-OSHardeningDeviations -DeviationUrl $DeviationUrl -PolicyType UserRightsAssignment -Policy $Policy
-    if ($null -ne $deviation) {
-        $Identity = [System.String[]] $deviation
+    if (![string]::IsNullOrWhiteSpace($DeviationUrl))
+    {
+        $deviation = Get-Deviation -Url $DeviationUrl -PolicyType AzUserRightsAssignment -Policy $Policy
+        if ($null -ne $deviation)
+        {
+            $Identity = [System.String[]] $deviation
+        }
     }
 
     $userRightConstant = Get-UserRightConstant -Policy $Policy
@@ -367,9 +371,13 @@ function Test-TargetResource
         $Force
     )
 
-    $deviation = Get-OSHardeningDeviations -DeviationUrl $DeviationUrl -PolicyType UserRightsAssignment -Policy $Policy
-    if ($null -ne $deviation) {
-        $Identity = [System.String[]] $deviation
+    if ($DeviationUrl)
+    {
+        $deviation = Get-Deviation -Url $DeviationUrl -PolicyType AzUserRightsAssignment -Policy $Policy
+        if ($null -ne $deviation)
+        {
+            $Identity = [System.String[]] $deviation
+        }
     }
 
     $currentUserRights = Get-UserRightPolicy -Name $Policy

@@ -1,5 +1,5 @@
 .NAME
-    UserRightsAssignment
+    AzUserRightsAssignment
 
 .DESCRIPTION
     This resource can be used to manage user rights assignment in local security policies.
@@ -33,21 +33,21 @@ The 'AccessComputerFromNetwork' resource will add the specified identities to
 the assignment without overwriting any pre-existing values, as the 'Force' parameter
 is not specified, and therefore defaults to $false.
 
-Configuration UserRightsAssignment_Basic_Config
+Configuration AzUserRightsAssignment_Basic_Config
 {
     Import-DscResource -ModuleName SecurityPolicyDsc
 
     Node localhost
     {
         # Assign shutdown privileges to only Builtin\Administrators
-        UserRightsAssignment AssignShutdownPrivilegesToAdmins
+        AzUserRightsAssignment AssignShutdownPrivilegesToAdmins
         {
             Policy   = "Shut_down_the_system"
             Identity = "Builtin\Administrators"
             Force    = $true
         }
 
-        UserRightsAssignment AccessComputerFromNetwork
+        AzUserRightsAssignment AccessComputerFromNetwork
         {
             Policy   = "Access_this_computer_from_the_network"
             Identity = "contoso\TestUser1", "contoso\TestUser2"
@@ -60,13 +60,13 @@ Configuration UserRightsAssignment_Basic_Config
 This configuration will manage a User Rights Assignment policy.
 When Identity is an empty string all identities will be removed from the policy.
 
-Configuration UserRightsAssignment_Remove_All_Identities_From_Policy_Config
+Configuration AzUserRightsAssignment_Remove_All_Identities_From_Policy_Config
 {
     Import-DscResource -ModuleName SecurityPolicyDsc
 
     Node localhost
     {
-        UserRightsAssignment RemoveIdsFromSeTrustedCredManAccessPrivilege
+        AzUserRightsAssignment RemoveIdsFromSeTrustedCredManAccessPrivilege
         {
             Policy   = "Access_Credential_Manager_as_a_trusted_caller"
             Identity = ""

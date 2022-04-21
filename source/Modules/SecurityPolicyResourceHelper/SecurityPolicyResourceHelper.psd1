@@ -71,9 +71,9 @@ Description = 'Functions used by the DSC resources in SecurityPolicyDsc.'
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Add-PolicyOption', 'ConvertFrom-SDDLDescriptor',
                'ConvertTo-LocalFriendlyName', 'ConvertTo-NTAccount',
-               'ConvertTo-SDDLDescriptor', 'ConvertTo-Sid', 'Get-LocalizedData',
-               'Get-SecurityPolicy', 'Get-UserRightConstant', 'Get-UserRightsAssignment',
-               'Invoke-Secedit', 'Test-IdentityIsNull'
+               'ConvertTo-SDDLDescriptor', 'ConvertTo-Sid', 'Get-Deviation',
+               'Get-LocalizedData', 'Get-SecurityPolicy', 'Get-UserRightConstant',
+               'Get-AzUserRightsAssignment', 'Invoke-Secedit', 'Test-IdentityIsNull'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'

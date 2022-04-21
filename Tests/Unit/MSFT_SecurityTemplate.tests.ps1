@@ -36,7 +36,7 @@ try
         }
 
         function Set-HashValue
-        {  
+        {
             [OutputType([Hashtable])]
             param
             (
@@ -58,7 +58,7 @@ try
 
             Context 'Get and Test method tests' {
                 Mock -CommandName Get-SecurityTemplate -MockWith {}
-                Mock -CommandName Test-Path -MockWith {$true}                                  
+                Mock -CommandName Test-Path -MockWith {$true}
 
                 if($securityModulePresent)
                 {
@@ -66,7 +66,7 @@ try
                     Mock -CommandName Get-Module -MockWith {return $true}
                     Mock -CommandName Format-SecurityPolicyFile -MockWith {"file.inf"}
 
-                    It 'Should return path of inf with SecurityCmdlets' { 
+                    It 'Should return path of inf with SecurityCmdlets' {
                         $getResult = Get-TargetResource @testParameters
                         $getResult.Path | Should BeLike "*.inf"
 
@@ -77,7 +77,7 @@ try
                 {
                     It 'Should return path of desired inf without SecurityCmdlets' {
                         Mock -CommandName Get-Module -MockWith {$false}
-                    
+
                         $getResult = Get-TargetResource @testParameters
                         $getResult.Path | Should BeLike "*.inf"
 
@@ -88,35 +88,35 @@ try
                 It 'Should throw if inf not found' {
                     Mock -CommandName Test-Path -MockWith {$false}
                     {Test-TargetResource @testParameters} | should throw "$($testParameters.Path) not found"
-                }        
+                }
                 foreach($key in $mockResults.'Privilege Rights'.Keys)
-                {                        
+                {
                     $mockFalseResults = Set-HashValue -HashTable $modifiedMockResults -Key $key -NewValue NoIdentity
-                    
+
                     Mock -CommandName Get-SecurityPolicy -MockWith {return $mockResults} -ParameterFilter {$FilePath -eq $null}
-                    Mock -CommandName Get-SecurityPolicy -MockWith {return $mockFalseResults} -ParameterFilter {$FilePath -eq $testParameters.Path} 
+                    Mock -CommandName Get-SecurityPolicy -MockWith {return $mockFalseResults} -ParameterFilter {$FilePath -eq $testParameters.Path}
                     Mock -CommandName Test-Path -MockWith {$true}
 
-                    It "Test method should return false when testing $key" {  
+                    It "Test method should return false when testing $key" {
                         Test-TargetResource @testParameters | Should Be $false
                     }
-                }                
+                }
             }
 
             Context 'Set method tests' {
                 if($securityModulePresent)
                 {
                     Mock Restore-SecurityPolicy  -MockWith {}
-                }                    
+                }
                     Mock Invoke-Secedit -MockWith {}
                     Mock Test-TargetResource -MockWith {$true}
 
                 if($securityModulePresent)
-                {        
+                {
                     It 'Should Call Restore-SecurityPolicy when SecurityCmdlet module does exist' {
                         Mock Get-Module -MockWith {$true}
                         {Set-TargetResource @testParameters} | Should Not throw
-                        Assert-MockCalled -CommandName Restore-SecurityPolicy -Exactly 1                    
+                        Assert-MockCalled -CommandName Restore-SecurityPolicy -Exactly 1
                     }
                 }
             }
@@ -127,22 +127,22 @@ try
                 $mockResults = Import-Clixml -Path "$PSScriptRoot\..\TestHelpers\MockObjects\MockResults.xml"
 
                 It 'Should return true when in a desired state' {
-                    Mock -CommandName Get-UserRightsAssignment -MockWith {$mockResults}
+                    Mock -CommandName Get-AzUserRightsAssignment -MockWith {$mockResults}
                     Mock -CommandName Get-SecurityTemplate -MockWith {}
                     Mock -CommandName Test-Path -MockWith {$true}
                     Mock -CommandName Get-SecurityPolicy -MockWith {}
                     Mock -CommandName Get-Module -MockWith {}
-                    
+
                     if($securityModulePresent)
                     {
                         Mock -CommandName Backup-SecurityPolicy -MockWith {}
                     }
 
-                    Test-TargetResource @testParameters | should be $true                       
+                    Test-TargetResource @testParameters | should be $true
                 }
             }
         }
-        
+
         Describe 'Test helper functions' {
             Context 'Test Format-SecurityPolicyFile' {
                 It 'Should not throw' {
@@ -169,10 +169,10 @@ try
                     Assert-MockCalled -CommandName Start-Process -Exactly 1 -Scope Context -ModuleName SecurityPolicyResourceHelper
                 }
             }
-        }     
+        }
     }
 }
 finally
 {
-    Restore-TestEnvironment -TestEnvironment $script:testEnvironment  
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
