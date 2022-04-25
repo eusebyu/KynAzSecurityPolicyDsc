@@ -12,9 +12,9 @@ $rule = @{
 }
 
 $deviationRule = @{
-    Policy   = 'Change_the_system_time'
-    Identity = 'builtin\Administrators','*S-1-5-6','S-1-5-90-0'
-    Url      = "$PSScriptRoot\deviations.json"
+    Policy    = 'Change_the_system_time'
+    Identity  = 'builtin\Administrators','*S-1-5-6','S-1-5-90-0'
+    ConfigUri = "$PSScriptRoot\..\Config\Change_the_system_time.json"
 }
 
 $removeAll = @{
@@ -42,9 +42,18 @@ configuration MSFT_AzUserRightsAssignment_config {
 
     AzUserRightsAssignment ChangeTheSystemTime
     {
-        Policy       = $deviationRule.Policy
-        Identity     = $deviationRule.Identity
-        DeviationUrl = $deviationRule.Url
+        Policy    = $deviationRule.Policy
+        Identity  = $deviationRule.Identity
+        ConfigUri = $deviationRule.ConfigUri
+    }
+
+    AzUserRightsAssignment ChangeTheSystemTime2
+    {
+        Policy          = $deviationRule.Policy
+        Identity        = $deviationRule.Identity
+        ConfigUri       = $deviationRule.ConfigUri
+        Deviation       = "Disabled"
+        FeatureIdentity = "Enabled"
     }
 
     AzUserRightsAssignment RemoveAllActAsOS

@@ -14,6 +14,8 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_AzUserRightsAssign
         Specifies the policy to configure.
     .PARAMETER Identity
         Specifies the identity to add to a user rights assignment.
+    .PARAMETER ConfigUri
+        The URL or path of the JSON file containing the configuration for the resource.
 #>
 function Get-TargetResource
 {
@@ -79,8 +81,19 @@ function Get-TargetResource
         $Identity,
 
         [Parameter()]
+        [AllowEmptyString()]
         [System.String]
-        $DeviationUrl,
+        $ConfigUri,
+
+        [Parameter()]
+        [ValidateSet("Enabled","Disabled")]
+        [System.String]
+        $Deviation = "Enabled",
+
+        [Parameter()]
+        [ValidateSet("Enabled","Disabled")]
+        [System.String]
+        $FeatureIdentity = "Disabled",
 
         [Parameter()]
         [ValidateSet("Present","Absent")]
@@ -109,6 +122,8 @@ function Get-TargetResource
         Specifies the policy to configure.
     .PARAMETER Identity
         Specifies the identity to add to a user rights assignment.
+    .PARAMETER ConfigUri
+        The URL or path of the JSON file containing the configuration for the resource.
 #>
 function Set-TargetResource
 {
@@ -173,8 +188,19 @@ function Set-TargetResource
         $Identity,
 
         [Parameter()]
+        [AllowEmptyString()]
         [System.String]
-        $DeviationUrl,
+        $ConfigUri,
+
+        [Parameter()]
+        [ValidateSet("Enabled","Disabled")]
+        [System.String]
+        $Deviation = "Enabled",
+
+        [Parameter()]
+        [ValidateSet("Enabled","Disabled")]
+        [System.String]
+        $FeatureIdentity = "Disabled",
 
         [Parameter()]
         [ValidateSet("Present","Absent")]
@@ -186,12 +212,39 @@ function Set-TargetResource
         $Force = $false
     )
 
-    if (![string]::IsNullOrWhiteSpace($DeviationUrl))
+    if (![string]::IsNullOrWhiteSpace($ConfigUri))
     {
-        $deviation = Get-Deviation -Url $DeviationUrl -PolicyType AzUserRightsAssignment -Policy $Policy
-        if ($null -ne $deviation)
+        try {
+            $configData = [System.Net.WebClient]::new().DownloadString($ConfigUri) | ConvertFrom-Json -ErrorAction Stop
+        }
+        catch {
+            Throw "Failed to download the JSON configuration file from '$ConfigUri' with error: ${$_.Exception.Message}"
+        }
+
+        if ($Deviation -eq "Enabled")
         {
-            $Identity = [System.String[]] $deviation
+            $UUID = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
+            if ($null -eq $UUID)
+            {
+                Throw "Failed to get the unique identifier from the local machine."
+            }
+
+            if ($UUID -in $configData.Deviation.PSObject.Properties.Name)
+            {
+                $Identity = [System.String[]] $configData.Deviation."$UUID"
+                $FeatureIdentity = "Disabled"
+            }
+        }
+
+        if ($FeatureIdentity -eq "Enabled")
+        {
+            foreach ($feature in $configData.FeatureIdentity)
+            {
+                if ((Get-WindowsFeature -Name $feature.FeatureName).InstallState)
+                {
+                    $Identity += [System.String[]] $feature.Identity
+                }
+            }
         }
     }
 
@@ -288,11 +341,13 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current identities assigned to a user rights assignment.
+        Tests the current identities assigned to a user rights assignment.
     .PARAMETER Policy
-    Specifies the policy to configure.
+        Specifies the policy to configure.
     .PARAMETER Identity
-    Specifies the identity to add to a user rights assignment.
+        Specifies the identity to add to a user rights assignment.
+    .PARAMETER ConfigUri
+        The URL or path of the JSON file containing the configuration for the resource.
 #>
 function Test-TargetResource
 {
@@ -358,8 +413,19 @@ function Test-TargetResource
         $Identity,
 
         [Parameter()]
+        [AllowEmptyString()]
         [System.String]
-        $DeviationUrl,
+        $ConfigUri,
+
+        [Parameter()]
+        [ValidateSet("Enabled","Disabled")]
+        [System.String]
+        $Deviation = "Enabled",
+
+        [Parameter()]
+        [ValidateSet("Enabled","Disabled")]
+        [System.String]
+        $FeatureIdentity = "Disabled",
 
         [Parameter()]
         [ValidateSet("Present","Absent")]
@@ -371,12 +437,39 @@ function Test-TargetResource
         $Force
     )
 
-    if ($DeviationUrl)
+    if (![string]::IsNullOrWhiteSpace($ConfigUri))
     {
-        $deviation = Get-Deviation -Url $DeviationUrl -PolicyType AzUserRightsAssignment -Policy $Policy
-        if ($null -ne $deviation)
+        try {
+            $configData = [System.Net.WebClient]::new().DownloadString($ConfigUri) | ConvertFrom-Json -ErrorAction Stop
+        }
+        catch {
+            Throw "Failed to download the JSON configuration file from '$ConfigUri' with error: ${$_.Exception.Message}"
+        }
+
+        if ($Deviation -eq "Enabled")
         {
-            $Identity = [System.String[]] $deviation
+            $UUID = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
+            if ($null -eq $UUID)
+            {
+                Throw "Failed to get the unique identifier from the local machine."
+            }
+
+            if ($UUID -in $configData.Deviation.PSObject.Properties.Name)
+            {
+                $Identity = [System.String[]] $configData.Deviation."$UUID"
+                $FeatureIdentity = "Disabled"
+            }
+        }
+
+        if ($FeatureIdentity -eq "Enabled")
+        {
+            foreach ($feature in $configData.FeatureIdentity)
+            {
+                if ((Get-WindowsFeature -Name $feature.FeatureName).InstallState)
+                {
+                    $Identity += [System.String[]] $feature.Identity
+                }
+            }
         }
     }
 
