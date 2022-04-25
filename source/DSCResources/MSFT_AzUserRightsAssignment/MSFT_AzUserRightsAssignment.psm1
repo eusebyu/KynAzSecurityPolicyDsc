@@ -224,7 +224,7 @@ function Set-TargetResource
         if ($Deviation -eq "Enabled")
         {
             $UUID = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
-            if ($null -eq $UUID)
+            if ([string]::IsNullOrWhiteSpace($UUID))
             {
                 Throw "Failed to get the unique identifier from the local machine."
             }
@@ -449,7 +449,7 @@ function Test-TargetResource
         if ($Deviation -eq "Enabled")
         {
             $UUID = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
-            if ($null -eq $UUID)
+            if ([string]::IsNullOrWhiteSpace($UUID))
             {
                 Throw "Failed to get the unique identifier from the local machine."
             }
