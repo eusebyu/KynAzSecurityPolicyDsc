@@ -16,7 +16,7 @@ Updated author, copyright notice, and URLs.
 .PRIVATEDATA
 #>
 
-#Requires -Module SecurityPolicyDsc
+#Requires -Module AzSecurityPolicyDsc
 
 
 <#
