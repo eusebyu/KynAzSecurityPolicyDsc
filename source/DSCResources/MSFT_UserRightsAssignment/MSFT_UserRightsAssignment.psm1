@@ -91,11 +91,6 @@ function Get-TargetResource
         $Deviation = "Enabled",
 
         [Parameter()]
-        [ValidateSet("Enabled","Disabled")]
-        [System.String]
-        $FeatureIdentity = "Disabled",
-
-        [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
         $Ensure = "Present",
