@@ -42,14 +42,14 @@ configuration MSFT_UserRightsAssignment_config {
 
     UserRightsAssignment ChangeTheSystemTime
     {
-        Policy   = $deviationRule.Policy
+        Policy = $deviationRule.Policy
         Identity = $deviationRule.Identity
-        BaseUrl  = $deviationRule.BaseUrl
+        BaseUrl = $deviationRule.BaseUrl
     }
 
     UserRightsAssignment RemoveAllActAsOS
     {
-        Policy   = $removeAll.Policy
+        Policy = $removeAll.Policy
         Identity = $removeAll.Identity
     }
 
