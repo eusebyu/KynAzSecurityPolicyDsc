@@ -173,7 +173,7 @@ A full list of changes in each version can be found in the [change log](CHANGELO
 | **IsSingleInstance** | Key | String | Specifies the resource is a single instance, the value must be 'Yes' |Yes|
 | **Path** | Required | String | The path to the desired security policy template (.inf) ||
 
-### AzUserRightsAssignment
+### UserRightsAssignment
 
 | Parameter | Attribute | DataType | Description | Allowed Values |
 | --- | --- | --- | --- | --- |
