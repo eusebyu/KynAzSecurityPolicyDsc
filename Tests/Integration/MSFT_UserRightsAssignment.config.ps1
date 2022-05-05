@@ -12,13 +12,13 @@ $rule = @{
 }
 
 $deviationRule = @{
-    Policy    = 'Change_the_system_time'
-    Identity  = 'builtin\Administrators','*S-1-5-6','S-1-5-90-0'
+    Policy = 'Change_the_system_time'
+    Identity = 'builtin\Administrators','*S-1-5-6','S-1-5-90-0'
     BaseUrl = "$PSScriptRoot/../Config\92EE484C-211A-11B2-A85C-AAA1E8E547EE/Change_the_system_time.yaml"
 }
 
 $removeAll = @{
-    Policy   = 'Act_as_part_of_the_operating_system'
+    Policy = 'Act_as_part_of_the_operating_system'
     Identity = ""
 }
 
@@ -42,14 +42,14 @@ configuration MSFT_UserRightsAssignment_config {
 
     UserRightsAssignment ChangeTheSystemTime
     {
-        Policy = $deviationRule.Policy
+        Policy   = $deviationRule.Policy
         Identity = $deviationRule.Identity
-        BaseUrl = $deviationRule.BaseUrl
+        BaseUrl  = $deviationRule.BaseUrl
     }
 
     UserRightsAssignment RemoveAllActAsOS
     {
-        Policy = $removeAll.Policy
+        Policy   = $removeAll.Policy
         Identity = $removeAll.Identity
     }
 
