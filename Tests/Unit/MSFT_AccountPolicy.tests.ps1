@@ -35,7 +35,6 @@ try
         $dscResourceInfo = Get-DscResource -Name AccountPolicy -Module AzSecurityPolicyDsc
         $testParameters = @{
             Name                                        = $resourceName
-            Deviation                                   = 'Disabled'
             Maximum_Password_Age                        = '15'
             Account_lockout_duration                    = '30'
             Store_passwords_using_reversible_encryption = 'Enabled'
@@ -132,7 +131,6 @@ try
                 BeforeAll {
                     $trueMockResult = $testParameters.Clone()
                     $trueMockResult.Remove('Name')
-                    $trueMockResult.Remove('Deviation')
 
                     Mock -CommandName Get-TargetResource -MockWith { $trueMockResult }
                 }
@@ -168,7 +166,7 @@ try
                 It 'Should call the expected mocks' {
                     Assert-MockCalled -CommandName Test-TargetResource `
                        -ParameterFilter { $Name -eq 'Test' } `
-                        -Exactly -Times ($testParameters.Count-2)
+                        -Exactly -Times ($testParameters.Count-1)
                     Assert-MockCalled -CommandName Test-TargetResource `
                         -ParameterFilter { $Name -eq $resourceName } `
                          -Exactly -Times 1
@@ -196,7 +194,7 @@ try
                     It 'Should call the expected mocks' {
                         Assert-MockCalled -CommandName Test-TargetResource `
                            -ParameterFilter { $Name -eq 'Test' } `
-                            -Exactly -Times ($testParameters.Count-2)
+                            -Exactly -Times ($testParameters.Count-1)
                         Assert-MockCalled -CommandName Test-TargetResource `
                             -ParameterFilter { $Name -eq $resourceName } `
                              -Exactly -Times 1
@@ -221,7 +219,7 @@ try
                     It 'Should call the expected mocks' {
                         Assert-MockCalled -CommandName Test-TargetResource `
                             -ParameterFilter { $Name -eq 'Test' } `
-                            -Exactly -Times ($testParameters.Count-2)
+                            -Exactly -Times ($testParameters.Count-1)
                         Assert-MockCalled -CommandName Test-TargetResource `
                             -ParameterFilter { $Name -eq $resourceName } `
                              -Exactly -Times 1
@@ -238,7 +236,6 @@ try
                 BeforeAll {
                     $testFailedParameters=$testParameters.Clone()
                     $testFailedParameters.Remove('Name')
-                    $testFailedParameters.Remove('Deviation')
                     $testFailedParameterKeys=$testFailedParameters.Keys | Sort-Object
 
                     Mock -CommandName Test-TargetResource `
@@ -257,7 +254,7 @@ try
                 It 'Should call the expected mocks' {
                     Assert-MockCalled -CommandName Test-TargetResource `
                         -ParameterFilter { $Name -eq 'Test' } `
-                        -Exactly -Times ($testParameters.Count-2)
+                        -Exactly -Times ($testParameters.Count-1)
                     Assert-MockCalled -CommandName Test-TargetResource `
                         -ParameterFilter { $Name -eq $resourceName } `
                          -Exactly -Times 1
