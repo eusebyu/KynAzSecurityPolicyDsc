@@ -1,4 +1,4 @@
-$script:DSCResourceName = 'MSFT_AzUserRightsAssignment'
+$script:DSCResourceName = 'MSFT_UserRightsAssignment'
 
 $resourcePath = (Get-DscResource -Name $script:DSCResourceName).Path
 Import-Module $resourcePath -Force
@@ -14,7 +14,7 @@ $rule = @{
 $deviationRule = @{
     Policy    = 'Change_the_system_time'
     Identity  = 'builtin\Administrators','*S-1-5-6','S-1-5-90-0'
-    ConfigUri = "$PSScriptRoot\..\Config\Change_the_system_time.json"
+    BaseUrl = "$PSScriptRoot/../Config\92EE484C-211A-11B2-A85C-AAA1E8E547EE/Change_the_system_time.yaml"
 }
 
 $removeAll = @{
@@ -31,38 +31,29 @@ $removeGuests = @{
 Set-TargetResource -Policy $removeAll.Policy -Identity 'Administrators' -Ensure 'Present'
 Set-TargetResource -Policy $removeGuests.Policy -Identity 'Guests' -Ensure 'Present'
 
-configuration MSFT_AzUserRightsAssignment_config {
-    Import-DscResource -ModuleName SecurityPolicyDsc
+configuration MSFT_UserRightsAssignment_config {
+    Import-DscResource -ModuleName AzSecurityPolicyDsc
 
-    AzUserRightsAssignment AccessCredentialManagerAsaTrustedCaller
+    UserRightsAssignment AccessCredentialManagerAsaTrustedCaller
     {
         Policy   = $rule.Policy
         Identity = $rule.Identity
     }
 
-    AzUserRightsAssignment ChangeTheSystemTime
+    UserRightsAssignment ChangeTheSystemTime
     {
-        Policy    = $deviationRule.Policy
-        Identity  = $deviationRule.Identity
-        ConfigUri = $deviationRule.ConfigUri
+        Policy   = $deviationRule.Policy
+        Identity = $deviationRule.Identity
+        BaseUrl  = $deviationRule.BaseUrl
     }
 
-    AzUserRightsAssignment ChangeTheSystemTime2
-    {
-        Policy          = $deviationRule.Policy
-        Identity        = $deviationRule.Identity
-        ConfigUri       = $deviationRule.ConfigUri
-        Deviation       = "Disabled"
-        FeatureIdentity = "Enabled"
-    }
-
-    AzUserRightsAssignment RemoveAllActAsOS
+    UserRightsAssignment RemoveAllActAsOS
     {
         Policy   = $removeAll.Policy
         Identity = $removeAll.Identity
     }
 
-    AzUserRightsAssignment DenyLogOnLocally
+    UserRightsAssignment DenyLogOnLocally
     {
         Policy   = $removeGuests.Policy
         Identity = $removeGuests.Identity

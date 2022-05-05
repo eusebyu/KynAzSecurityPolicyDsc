@@ -85,6 +85,16 @@ function Set-TargetResource
         $Name,
 
         [Parameter()]
+        [AllowEmptyString()]
+        [System.String]
+        $BaseUrl,
+
+        [Parameter()]
+        [ValidateSet("Enabled", "Disabled")]
+        [System.String]
+        $Deviation = 'Enabled',
+
+        [Parameter()]
         [ValidateRange(0, 24)]
         [System.UInt32]
         $Enforce_password_history,
@@ -163,12 +173,48 @@ function Set-TargetResource
     $script:seceditOutput = "$env:TEMP\Secedit-OutPut.txt"
     $accountPolicyToAddInf = "$env:TEMP\accountPolicyToAdd.inf"
 
-    $desiredPolicies = $PSBoundParameters.GetEnumerator() | Where-Object -FilterScript {$PSItem.key -in $accountPolicyData.Keys}
+    $boundParameters = [Hashtable] $PSBoundParameters
+
+    if (![string]::IsNullOrWhiteSpace($BaseUrl))
+    {
+        if ($Deviation -eq 'Enabled')
+        {
+            $uuid = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
+            if ([string]::IsNullOrWhiteSpace($uuid))
+            {
+                Throw "Failed to get the unique identifier from the local machine."
+            }
+
+            $url = "{0}/{1}/account_policy.yaml" -f $BaseUrl.Trim('/'), $uuid
+            try {
+                $configData = [System.Net.WebClient]::new().DownloadString($url) | ConvertFrom-Yaml -ErrorAction Stop
+                if ($configData -isnot [hashtable])
+                {
+                    Throw "Invalid configuration file '$url': not a hashtable."
+                }
+
+                $configData.GetEnumerator() | Where-Object -FilterScript {$PSItem.Key -in $accountPolicyData.Keys} | ForEach-Object { $boundParameters[$PSItem.Key] = ConvertTo-Parameter -Parameter $MyInvocation.MyCommand.Parameters."${$PSItem.Key}" -Value $PSItem.Value }
+            }
+            catch [System.Net.WebException] {
+                if ($_.Exception.Response.StatusCode -ne [System.Net.HttpStatusCode]::NotFound)
+                {
+                    Throw "Failed to download configuration data from '$url' with error: ${$_.Exception.Message}"
+                }
+            }
+            catch {
+                Throw "Failed to parse configuration data from '$url' with error: ${$_.Exception.Message}"
+            }
+        }
+    }
+
+    $desiredPolicies = $boundParameters.GetEnumerator() | Where-Object -FilterScript {$PSItem.Key -in $accountPolicyData.Keys}
 
     foreach ($policy in $desiredPolicies)
     {
         $testParameters = @{
             Name        = 'Test'
+            BaseUrl     = $BaseUrl
+            Deviation   = $Deviation
             $policy.Key = $policy.Value
             Verbose     = $false
         }
@@ -230,7 +276,7 @@ function Set-TargetResource
     Invoke-Secedit -InfPath $accountPolicyToAddInf -SecEditOutput $script:seceditOutput
     Remove-Item -Path $accountPolicyToAddInf
 
-    $successResult = Test-TargetResource @PSBoundParameters
+    $successResult = Test-TargetResource @boundParameters
 
     if ($successResult -eq $false)
     {
@@ -258,6 +304,16 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [AllowEmptyString()]
+        [System.String]
+        $BaseUrl,
+
+        [Parameter()]
+        [ValidateSet("Enabled", "Disabled")]
+        [System.String]
+        $Deviation = 'Enabled',
 
         [Parameter()]
         [ValidateRange(0, 24)]
@@ -332,7 +388,39 @@ function Test-TargetResource
 
     $currentAccountPolicies = Get-TargetResource -Name $Name -Verbose:0
 
-    $desiredAccountPolicies = $PSBoundParameters
+    $desiredAccountPolicies = [Hashtable] $PSBoundParameters
+
+    if (![string]::IsNullOrWhiteSpace($BaseUrl))
+    {
+        if ($Deviation -eq 'Enabled')
+        {
+            $uuid = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
+            if ([string]::IsNullOrWhiteSpace($uuid))
+            {
+                Throw "Failed to get the unique identifier from the local machine."
+            }
+
+            $url = "{0}/{1}/account_policy.yaml" -f $BaseUrl.Trim('/'), $uuid
+            try {
+                $configData = [System.Net.WebClient]::new().DownloadString($url) | ConvertFrom-Yaml -ErrorAction Stop
+                if ($configData -isnot [hashtable])
+                {
+                    Throw "Invalid configuration file '$url': not a hashtable."
+                }
+
+                $configData.GetEnumerator() | Where-Object -FilterScript {$PSItem.Key -in $accountPolicyData.Keys} | ForEach-Object { $desiredAccountPolicies[$PSItem.Key] = ConvertTo-Parameter -Parameter $MyInvocation.MyCommand.Parameters."${$PSItem.Key}" -Value $PSItem.Value }
+            }
+            catch [System.Net.WebException] {
+                if ($_.Exception.Response.StatusCode -ne [System.Net.HttpStatusCode]::NotFound)
+                {
+                    Throw "Failed to download configuration data from '$url' with error: ${$_.Exception.Message}"
+                }
+            }
+            catch {
+                Throw "Failed to parse configuration data from '$url' with error: ${$_.Exception.Message}"
+            }
+        }
+    }
 
     foreach ($policy in $desiredAccountPolicies.Keys)
     {

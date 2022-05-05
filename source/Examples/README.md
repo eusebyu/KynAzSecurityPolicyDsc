@@ -5,4 +5,4 @@ These are the links to the examples for each individual resource:
 - [AccountPolicy](Resources/AccountPolicy)
 - [SecurityOption](Resources/SecurityOption)
 - [SecurityTemplate](Resources/SecurityTemplate)
-- [AzUserRightsAssignment](Resources/AzUserRightsAssignment)
+- [UserRightsAssignment](Resources/UserRightsAssignment)

@@ -1,5 +1,5 @@
-$script:dscModuleName = 'SecurityPolicyDsc'
-$script:dscResourceName = 'MSFT_AzUserRightsAssignment'
+$script:dscModuleName = 'AzSecurityPolicyDsc'
+$script:dscResourceName = 'MSFT_UserRightsAssignment'
 
 function Invoke-TestSetup
 {

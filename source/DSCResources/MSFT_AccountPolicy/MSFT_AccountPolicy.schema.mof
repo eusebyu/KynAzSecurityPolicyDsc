@@ -3,6 +3,8 @@
 class MSFT_AccountPolicy : OMI_BaseResource
 {
     [Key, Description("A unique name of the AccountPolicy resource instance. This is not used during configuration.")] String Name;
+    [Write, Description("The URL to the hashtable containing additional settings for the DSC resource.")] String BaseUrl;
+    [Write, Description("Desired state of deviations for this resource."), ValueMap{"Enabled","Disabled"}, Values{"Enabled","Disabled"}] String Deviation;
     [Write, Description("Specifies the number of unique new passwords that must be associated with a user account before an old password can be reused. A number from 0 through 24 can be specified")] Uint32 Enforce_password_history;
     [Write, Description("Specifies the period of time (in days) that a password can be used before the system requires the user to change it. A number from 0 through 999 can be specified, with 0 meaning the password will never expire")] Uint32 Maximum_Password_Age;
     [Write, Description("Specifies the period of time (in days) that a password must be used before the user can change it. A number from 0 to 998 can be specified")] Uint32 Minimum_Password_Age;

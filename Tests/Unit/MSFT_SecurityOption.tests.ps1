@@ -1,4 +1,4 @@
-$script:dscModuleName = 'SecurityPolicyDsc'
+$script:dscModuleName = 'AzSecurityPolicyDsc'
 $script:dscResourceName = 'MSFT_SecurityOption'
 
 function Invoke-TestSetup
@@ -30,7 +30,7 @@ try
 {
     InModuleScope 'MSFT_SecurityOption' {
 
-        $dscResourceInfo = Get-DscResource -Name SecurityOption -Module SecurityPolicyDsc
+        $dscResourceInfo = Get-DscResource -Name SecurityOption -Module AzSecurityPolicyDsc
         $testParameters = @{
             Name = 'Test'
             User_Account_Control_Behavior_of_the_elevation_prompt_for_standard_users = 'Automatically deny elevation request'

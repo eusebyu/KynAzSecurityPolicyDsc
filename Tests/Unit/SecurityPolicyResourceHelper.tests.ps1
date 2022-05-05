@@ -60,12 +60,12 @@ InModuleScope $script:subModuleName {
             Assert-MockCalled -CommandName Start-Process -Exactly 1
         }
     }
-    Describe 'SecurityPolicyResourceHelper\Get-AzUserRightsAssignment' {
+    Describe 'SecurityPolicyResourceHelper\Get-UserRightsAssignment' {
         BeforeAll {
             $ini = "$PSScriptRoot\..\TestHelpers\TestIni.txt"
             Mock -CommandName ConvertTo-LocalFriendlyName -MockWith { 'Value1' }
 
-            $result = Get-AzUserRightsAssignment $ini
+            $result = Get-UserRightsAssignment $ini
         }
 
         It 'Should match INI Section' {

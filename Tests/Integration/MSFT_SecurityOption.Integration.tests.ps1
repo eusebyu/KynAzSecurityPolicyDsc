@@ -1,5 +1,5 @@
 
-$script:DSCModuleName   = 'SecurityPolicyDsc'
+$script:DSCModuleName   = 'AzSecurityPolicyDsc'
 $script:DSCResourceName = 'MSFT_SecurityOption'
 
 #region HEADER

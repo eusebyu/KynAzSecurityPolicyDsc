@@ -1,5 +1,5 @@
 
-$script:DSCModuleName   = 'SecurityPolicyDsc'
+$script:DSCModuleName   = 'AzSecurityPolicyDsc'
 $script:DSCResourceName = 'MSFT_AccountPolicy'
 
 #region HEADER
@@ -38,11 +38,11 @@ try
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
             {
-                Get-DscConfiguration -Verbose -ErrorAction Stop 
+                Get-DscConfiguration -Verbose -ErrorAction Stop
             } | Should Not Throw
         }
         #endregion
-        
+
         $currentAccountPolicies = Get-DscConfiguration
         foreach ( $key in $accountPolicies.Keys)
         {

@@ -197,9 +197,9 @@ function Get-SecurityPolicy
     .PARAMETER FilePath
         Path to an INF file
     .EXAMPLE
-        Get-AzUserRightsAssignment -FilePath C:\seceditOutput.inf
+        Get-UserRightsAssignment -FilePath C:\seceditOutput.inf
 #>
-function Get-AzUserRightsAssignment
+function Get-UserRightsAssignment
 {
     [OutputType([Hashtable])]
     [CmdletBinding()]
@@ -652,4 +652,117 @@ function ConvertTo-SDDLDescriptor
     }
 
     return $result
+}
+
+<#
+    .SYNOPSIS
+        Convert the input value to given parameter type and checks if value passes validation checks.
+    .PARAMETER Parameter
+        The metadata containing information about the parameter to check the value against.
+    .PARAMETER Value
+        The value to be checked.
+#>
+function ConvertTo-Parameter
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [System.Management.Automation.ParameterMetadata]
+        $Parameter,
+
+        [Parameter(Mandatory = $true)]
+        [System.Object]
+        $Value
+    )
+
+    # check parameter type
+    switch ($Parameter.ParameterType.Name) {
+        'String'
+        {
+            if ($Value -isnot [string])
+            {
+                $Value = [string] $Value
+            }
+        }
+        'String[]'
+        {
+            if ($Value -isnot [string])
+            {
+                $Value = [string[]] $Value
+            }
+        }
+        'Boolean'
+        {
+            if ($Value -isnot [bool])
+            {
+                if ($Value -in @('false', 'no'))
+                {
+                    $Value = $false
+                }
+                elseif ($Value -in @('true', 'yes'))
+                {
+                    $Value = $true
+                }
+                else
+                {
+                    Throw "Invalid value type for parameter '$($Parameter.Name)'. Expected '$($Parameter.ParameterType.Name)', but got '$($Value.GetType())'."
+                }
+            }
+        }
+        'Int32'
+        {
+            if ($Value -isnot [Int32])
+            {
+                try
+                {
+                    $Value = [int] $Value
+                }
+                catch
+                {
+                    Throw "Invalid value type for parameter '$($Parameter.Name)'. Expected '$($Parameter.ParameterType.Name)', but got '$($Value.GetType())'."
+                }
+            }
+        }
+        'UInt32'
+        {
+            if ($Value -isnot [UInt32])
+            {
+                try
+                {
+                    $Value = [UInt32] $Value
+                }
+                catch
+                {
+                    Throw "Invalid value type for parameter '$($Parameter.Name)'. Expected '$($Parameter.ParameterType.Name)', but got '$($Value.GetType())'."
+                }
+            }
+        }
+        Default
+        {
+            Throw "Unsupported parameter type for parameter '$($Parameter.Name)': $($Parameter.ParameterType.Name)"
+        }
+    }
+
+    # check parameter value
+    switch ($Parameter.Attributes.TypeId.Name)
+    {
+        'ValidateSetAttribute'
+        {
+            if ($Value -notin $Parameter.Attributes.ValidValues)
+            {
+                Throw "Invalid value for parameter '$($Parameter.Name)'. Valid choices: $($Parameter.Attributes.ValidValues -join ', ')."
+            }
+        }
+        'ValidateRangeAttribute'
+        {
+            if ($Value -lt $Parameter.Attributes.MinRange -or $Value -gt $Parameter.Attributes.MaxRange)
+            {
+                Throw "Invalid value for parameter '$($Parameter.Name)'. Valid range: [$($Parameter.Attributes.MinRange), $($Parameter.Attributes.MaxRange)]."
+            }
+        }
+        Default {}
+    }
+
+    $Value
 }

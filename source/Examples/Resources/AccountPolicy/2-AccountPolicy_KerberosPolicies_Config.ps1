@@ -8,13 +8,13 @@
 .LICENSEURI https://github.com/dsccommunity/SecurityPolicyDsc/blob/master/LICENSE
 .PROJECTURI https://github.com/dsccommunity/SecurityPolicyDsc
 .ICONURI https://dsccommunity.org/images/DSC_Logo_300p.png
-.EXTERNALMODULEDEPENDENCIES 
+.EXTERNALMODULEDEPENDENCIES
 .REQUIREDSCRIPTS
 .EXTERNALSCRIPTDEPENDENCIES
 .RELEASENOTES
 Updated author, copyright notice, and URLs.
 .PRIVATEDATA
-#> 
+#>
 
 #Requires -Module SecurityPolicyDsc
 
@@ -37,7 +37,7 @@ Configuration AccountPolicy_KerberosPolicies_Config
         $DomainCred
     )
 
-    Import-DscResource -ModuleName SecurityPolicyDsc
+    Import-DscResource -ModuleName AzSecurityPolicyDsc
 
     node localhost
     {

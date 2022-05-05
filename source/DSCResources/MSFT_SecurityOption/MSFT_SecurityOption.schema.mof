@@ -9,6 +9,8 @@ class MSFT_RestrictedRemoteSamSecurityDescriptor
 class MSFT_SecurityOption : OMI_BaseResource
 {
     [Key, Description("Describes the security option to be managed. This could be anything as long as it is unique")] String Name;
+    [Write, Description("The URL to the hashtable containing additional settings for the DSC resource.")] String BaseUrl;
+    [Write, Description("Desired state of deviations for this resource."), ValueMap{"Enabled","Disabled"}, Values{"Enabled","Disabled"}] String Deviation;
     [Write, Description("Determines whether the local Administrator account is enabled or disabled"), ValueMap{"Enabled","Disabled"}, Values{"Enabled","Disabled"}] String Accounts_Administrator_account_status;
     [Write, Description("Prevents using the Settings app to add a Microsoft account for single sign-on (SSO) authentication for Microsoft services and some background services, or using a Microsoft account for single sign-on to other applications or services."), ValueMap{"This policy is disabled","Users cant add Microsoft accounts","Users cant add or log on with Microsoft accounts"}, Values{"This policy is disabled","Users cant add Microsoft accounts","Users cant add or log on with Microsoft accounts"}] String Accounts_Block_Microsoft_accounts;
     [Write, Description("Determines whether the Guest account is enabled or disabled"), ValueMap{"Enabled","Disabled"}, Values{"Enabled","Disabled"}] String Accounts_Guest_account_status;

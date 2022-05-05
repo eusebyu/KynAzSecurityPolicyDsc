@@ -16,7 +16,7 @@ Updated author, copyright notice, and URLs.
 .PRIVATEDATA
 #>
 
-#Requires -Module SecurityPolicyDsc
+#Requires -Module AzSecurityPolicyDsc
 
 <#
     .DESCRIPTION
@@ -29,21 +29,21 @@ Updated author, copyright notice, and URLs.
         the assignment without overwriting any pre-existing values, as the 'Force' parameter
         is not specified, and therefore defaults to $false.
 #>
-Configuration AzUserRightsAssignment_Basic_Config
+Configuration UserRightsAssignment_Basic_Config
 {
-    Import-DscResource -ModuleName SecurityPolicyDsc
+    Import-DscResource -ModuleName AzSecurityPolicyDsc
 
     Node localhost
     {
         # Assign shutdown privileges to only Builtin\Administrators
-        AzUserRightsAssignment AssignShutdownPrivilegesToAdmins
+        UserRightsAssignment AssignShutdownPrivilegesToAdmins
         {
             Policy   = "Shut_down_the_system"
             Identity = "Builtin\Administrators"
             Force    = $true
         }
 
-        AzUserRightsAssignment AccessComputerFromNetwork
+        UserRightsAssignment AccessComputerFromNetwork
         {
             Policy   = "Access_this_computer_from_the_network"
             Identity = "contoso\TestUser1", "contoso\TestUser2"

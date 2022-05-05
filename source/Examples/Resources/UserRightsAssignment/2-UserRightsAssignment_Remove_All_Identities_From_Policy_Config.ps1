@@ -16,7 +16,7 @@ Updated author, copyright notice, and URLs.
 .PRIVATEDATA
 #>
 
-#Requires -Module SecurityPolicyDsc
+#Requires -Module AzSecurityPolicyDsc
 
 <#
     .DESCRIPTION
@@ -25,11 +25,11 @@ Updated author, copyright notice, and URLs.
 #>
 Configuration AzUserRightsAssignment_Remove_All_Identities_From_Policy_Config
 {
-    Import-DscResource -ModuleName SecurityPolicyDsc
+    Import-DscResource -ModuleName AzSecurityPolicyDsc
 
     Node localhost
     {
-        AzUserRightsAssignment RemoveIdsFromSeTrustedCredManAccessPrivilege
+        UserRightsAssignment RemoveIdsFromSeTrustedCredManAccessPrivilege
         {
             Policy   = "Access_Credential_Manager_as_a_trusted_caller"
             Identity = ""

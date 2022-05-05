@@ -8,7 +8,7 @@ $securityOptions = @{
 
 configuration MSFT_SecurityOption_config
 {
-    Import-DscResource -ModuleName 'SecurityPolicyDsc'
+    Import-DscResource -ModuleName 'AzSecurityPolicyDsc'
 
     node localhost
     {

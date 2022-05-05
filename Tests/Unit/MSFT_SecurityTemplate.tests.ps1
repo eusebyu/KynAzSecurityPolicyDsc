@@ -1,4 +1,4 @@
-$script:dscModuleName = 'SecurityPolicyDsc'
+$script:dscModuleName = 'AzSecurityPolicyDsc'
 $script:dscResourceName = 'MSFT_SecurityTemplate'
 
 function Invoke-TestSetup
@@ -127,7 +127,7 @@ try
                 $mockResults = Import-Clixml -Path "$PSScriptRoot\..\TestHelpers\MockObjects\MockResults.xml"
 
                 It 'Should return true when in a desired state' {
-                    Mock -CommandName Get-AzUserRightsAssignment -MockWith {$mockResults}
+                    Mock -CommandName Get-UserRightsAssignment -MockWith {$mockResults}
                     Mock -CommandName Get-SecurityTemplate -MockWith {}
                     Mock -CommandName Test-Path -MockWith {$true}
                     Mock -CommandName Get-SecurityPolicy -MockWith {}

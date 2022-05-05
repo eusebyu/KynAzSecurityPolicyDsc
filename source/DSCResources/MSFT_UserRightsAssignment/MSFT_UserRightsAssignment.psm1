@@ -5,7 +5,7 @@ Import-Module -Name (Join-Path -Path $modulesRootPath  `
               -Force
 
 
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_AzUserRightsAssignment'
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_UserRightsAssignment'
 
 <#
     .SYNOPSIS
@@ -14,8 +14,8 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_AzUserRightsAssign
         Specifies the policy to configure.
     .PARAMETER Identity
         Specifies the identity to add to a user rights assignment.
-    .PARAMETER ConfigUri
-        The URL or path of the JSON file containing the configuration for the resource.
+    .PARAMETER BaseUrl
+        The base URL of the configuration file.
 #>
 function Get-TargetResource
 {
@@ -122,8 +122,8 @@ function Get-TargetResource
         Specifies the policy to configure.
     .PARAMETER Identity
         Specifies the identity to add to a user rights assignment.
-    .PARAMETER ConfigUri
-        The URL or path of the JSON file containing the configuration for the resource.
+    .PARAMETER BaseUrl
+        The base URL of the configuration file.
 #>
 function Set-TargetResource
 {
@@ -190,17 +190,12 @@ function Set-TargetResource
         [Parameter()]
         [AllowEmptyString()]
         [System.String]
-        $ConfigUri,
+        $BaseUrl,
 
         [Parameter()]
         [ValidateSet("Enabled","Disabled")]
         [System.String]
         $Deviation = "Enabled",
-
-        [Parameter()]
-        [ValidateSet("Enabled","Disabled")]
-        [System.String]
-        $FeatureIdentity = "Disabled",
 
         [Parameter()]
         [ValidateSet("Present","Absent")]
@@ -212,38 +207,88 @@ function Set-TargetResource
         $Force = $false
     )
 
-    if (![string]::IsNullOrWhiteSpace($ConfigUri))
+    if (![string]::IsNullOrWhiteSpace($BaseUri))
     {
-        try {
-            $configData = [System.Net.WebClient]::new().DownloadString($ConfigUri) | ConvertFrom-Json -ErrorAction Stop
-        }
-        catch {
-            Throw "Failed to download the JSON configuration file from '$ConfigUri' with error: ${$_.Exception.Message}"
-        }
+        $featureIdentity = $Deviation -eq 'Disabled'
 
-        if ($Deviation -eq "Enabled")
+        if ($Deviation -eq 'Enabled')
         {
-            $UUID = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
-            if ([string]::IsNullOrWhiteSpace($UUID))
+            $uuid = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
+            if ([string]::IsNullOrWhiteSpace($uuid))
             {
                 Throw "Failed to get the unique identifier from the local machine."
             }
 
-            if ($UUID -in $configData.Deviation.PSObject.Properties.Name)
-            {
-                $Identity = [System.String[]] $configData.Deviation."$UUID"
-                $FeatureIdentity = "Disabled"
+            $url = "{0}/{1}/{2}.yaml" -f $BaseUrl.Trim('/'), $uuid, $Policy
+            try {
+                $configData = [System.Net.WebClient]::new().DownloadString($url) | ConvertFrom-Yaml -ErrorAction Stop
+                if ($configData -isnot [hashtable])
+                {
+                    Throw "Invalid configuration file '$url': not a hashtable."
+                }
+
+                if ('Identity' -notin $configData.Keys -or $configData.Identity -isnot [System.Collections.Generic.List[System.Object]])
+                {
+                    Throw "Invalid configuration file '$url': 'Identity' item is missing or is not a list."
+                }
+
+                $Identity = ConvertTo-Parameter -Parameter $MyInvocation.MyCommand.Parameters.Identity -Value $configData.Identity
+                if ('Force' -in $configData.Keys)
+                {
+                    $Force = ConvertTo-Parameter -Parameter $MyInvocation.MyCommand.Parameters.Force -Value $configData.Force
+                }
+            }
+            catch [System.Net.WebException] {
+                if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::NotFound)
+                {
+                    $featureIdentity = $true
+                }
+                else
+                {
+                    Throw "Failed to download configuration data from '$url' with error: ${$_.Exception.Message}"
+                }
+            }
+            catch {
+                Throw "Failed to parse configuration data from '$url' with error: ${$_.Exception.Message}"
             }
         }
 
-        if ($FeatureIdentity -eq "Enabled")
+        if ($FeatureIdentity)
         {
-            foreach ($feature in $configData.FeatureIdentity)
-            {
-                if ((Get-WindowsFeature -Name $feature.FeatureName).InstallState)
+            $url = "{0}/FeatureIdentity/{1}.yaml" -f $BaseUrl.Trim('/'), $Policy
+            try {
+                $configData = [System.Net.WebClient]::new().DownloadString($url) | ConvertFrom-Yaml -ErrorAction Stop
+                if ($configData -isnot [System.Collections.Generic.List[System.Object]])
                 {
-                    $Identity += [System.String[]] $feature.Identity
+                    Throw "Invalid configuration file '$configDataUrl': not a list."
                 }
+
+                foreach ($feature in $configData)
+                {
+                    if ('FeatureName' -notin $feature.Keys)
+                    {
+                        Throw "Invalid configuration file '$url'. Missing required key: FeatureName."
+                    }
+
+                    if ('Identity' -notin $feature.Keys -or $feature.Identity -isnot [System.Collections.Generic.List[System.Object]])
+                    {
+                        Throw "Invalid configuration file '$url': 'Identity' item is missing or is not a list."
+                    }
+
+                    if ((Get-WindowsFeature -Name $feature.FeatureName).InstallState)
+                    {
+                        $Identity += ConvertTo-Parameter -Parameter $MyInvocation.MyCommand.Parameters.Identity -Value $feature.Identity
+                    }
+                }
+            }
+            catch [System.Net.WebException] {
+                if ($_.Exception.Response.StatusCode -ne [System.Net.HttpStatusCode]::NotFound)
+                {
+                    Throw "Failed to download configuration data from '$url' with error: ${$_.Exception.Message}"
+                }
+            }
+            catch {
+                Throw "Failed to parse configuration data from '$url' with error: ${$_.Exception.Message}"
             }
         }
     }
@@ -346,8 +391,8 @@ function Set-TargetResource
         Specifies the policy to configure.
     .PARAMETER Identity
         Specifies the identity to add to a user rights assignment.
-    .PARAMETER ConfigUri
-        The URL or path of the JSON file containing the configuration for the resource.
+    .PARAMETER BaseUrl
+        The base URL of the configuration file.
 #>
 function Test-TargetResource
 {
@@ -415,17 +460,12 @@ function Test-TargetResource
         [Parameter()]
         [AllowEmptyString()]
         [System.String]
-        $ConfigUri,
+        $BaseUrl,
 
         [Parameter()]
         [ValidateSet("Enabled","Disabled")]
         [System.String]
         $Deviation = "Enabled",
-
-        [Parameter()]
-        [ValidateSet("Enabled","Disabled")]
-        [System.String]
-        $FeatureIdentity = "Disabled",
 
         [Parameter()]
         [ValidateSet("Present","Absent")]
@@ -437,38 +477,88 @@ function Test-TargetResource
         $Force
     )
 
-    if (![string]::IsNullOrWhiteSpace($ConfigUri))
+    if (![string]::IsNullOrWhiteSpace($BaseUri))
     {
-        try {
-            $configData = [System.Net.WebClient]::new().DownloadString($ConfigUri) | ConvertFrom-Json -ErrorAction Stop
-        }
-        catch {
-            Throw "Failed to download the JSON configuration file from '$ConfigUri' with error: ${$_.Exception.Message}"
-        }
+        $featureIdentity = $Deviation -eq 'Disabled'
 
-        if ($Deviation -eq "Enabled")
+        if ($Deviation -eq 'Enabled')
         {
-            $UUID = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
-            if ([string]::IsNullOrWhiteSpace($UUID))
+            $uuid = Get-WmiObject -Class Win32_ComputerSystemProduct -Namespace root\CIMV2 | Select-Object -ExpandProperty UUID
+            if ([string]::IsNullOrWhiteSpace($uuid))
             {
                 Throw "Failed to get the unique identifier from the local machine."
             }
 
-            if ($UUID -in $configData.Deviation.PSObject.Properties.Name)
-            {
-                $Identity = [System.String[]] $configData.Deviation."$UUID"
-                $FeatureIdentity = "Disabled"
+            $url = "{0}/{1}/{2}.yaml" -f $BaseUrl.Trim('/'), $uuid, $Policy
+            try {
+                $configData = [System.Net.WebClient]::new().DownloadString($url) | ConvertFrom-Yaml -ErrorAction Stop
+                if ($configData -isnot [hashtable])
+                {
+                    Throw "Invalid configuration file '$url': not a hashtable."
+                }
+
+                if ('Identity' -notin $configData.Keys -or $configData.Identity -isnot [System.Collections.Generic.List[System.Object]])
+                {
+                    Throw "Invalid configuration file '$url': 'Identity' item is missing or is not a list."
+                }
+
+                $Identity = ConvertTo-Parameter -Parameter $MyInvocation.MyCommand.Parameters.Identity -Value $configData.Identity
+                if ('Force' -in $configData.Keys)
+                {
+                    $Force = ConvertTo-Parameter -Parameter $MyInvocation.MyCommand.Parameters.Force -Value $configData.Force
+                }
+            }
+            catch [System.Net.WebException] {
+                if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::NotFound)
+                {
+                    $featureIdentity = $true
+                }
+                else
+                {
+                    Throw "Failed to download configuration data from '$url' with error: ${$_.Exception.Message}"
+                }
+            }
+            catch {
+                Throw "Failed to parse configuration data from '$url' with error: ${$_.Exception.Message}"
             }
         }
 
-        if ($FeatureIdentity -eq "Enabled")
+        if ($FeatureIdentity)
         {
-            foreach ($feature in $configData.FeatureIdentity)
-            {
-                if ((Get-WindowsFeature -Name $feature.FeatureName).InstallState)
+            $url = "{0}/FeatureIdentity/{1}.yaml" -f $BaseUrl.Trim('/'), $Policy
+            try {
+                $configData = [System.Net.WebClient]::new().DownloadString($url) | ConvertFrom-Yaml -ErrorAction Stop
+                if ($configData -isnot [System.Collections.Generic.List[System.Object]])
                 {
-                    $Identity += [System.String[]] $feature.Identity
+                    Throw "Invalid configuration file '$configDataUrl': not a list."
                 }
+
+                foreach ($feature in $configData)
+                {
+                    if ('FeatureName' -notin $feature.Keys)
+                    {
+                        Throw "Invalid configuration file '$url'. Missing required key: FeatureName."
+                    }
+
+                    if ('Identity' -notin $feature.Keys -or $feature.Identity -isnot [System.Collections.Generic.List[System.Object]])
+                    {
+                        Throw "Invalid configuration file '$url': 'Identity' item is missing or is not a list."
+                    }
+
+                    if ((Get-WindowsFeature -Name $feature.FeatureName).InstallState)
+                    {
+                        $Identity += ConvertTo-Parameter -Parameter $MyInvocation.MyCommand.Parameters.Identity -Value $feature.Identity
+                    }
+                }
+            }
+            catch [System.Net.WebException] {
+                if ($_.Exception.Response.StatusCode -ne [System.Net.HttpStatusCode]::NotFound)
+                {
+                    Throw "Failed to download configuration data from '$url' with error: ${$_.Exception.Message}"
+                }
+            }
+            catch {
+                Throw "Failed to parse configuration data from '$url' with error: ${$_.Exception.Message}"
             }
         }
     }

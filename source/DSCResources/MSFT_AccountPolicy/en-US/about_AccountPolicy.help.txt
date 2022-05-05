@@ -11,62 +11,62 @@
 
 .PARAMETER Enforce_password_history
     Write - Uint32
-    
+
 
 .PARAMETER Maximum_Password_Age
     Write - Uint32
-    
+
 
 .PARAMETER Minimum_Password_Age
     Write - Uint32
-    
+
 
 .PARAMETER Minimum_Password_Length
     Write - Uint32
-    
+
 
 .PARAMETER Password_must_meet_complexity_requirements
     Write - String
     Allowed values: Enabled, Disabled
-    
+
 
 .PARAMETER Store_passwords_using_reversible_encryption
     Write - String
     Allowed values: Enabled, Disabled
-    
+
 
 .PARAMETER Account_lockout_duration
     Write - Uint32
-    
+
 
 .PARAMETER Account_lockout_threshold
     Write - Uint32
-    
+
 
 .PARAMETER Reset_account_lockout_counter_after
     Write - Uint32
-    
+
 
 .PARAMETER Enforce_user_logon_restrictions
     Write - String
     Allowed values: Enabled, Disabled
-    
+
 
 .PARAMETER Maximum_lifetime_for_service_ticket
     Write - Uint32
-    
+
 
 .PARAMETER Maximum_lifetime_for_user_ticket
     Write - Uint32
-    
+
 
 .PARAMETER Maximum_lifetime_for_user_ticket_renewal
     Write - Uint32
-    
+
 
 .PARAMETER Maximum_tolerance_for_computer_clock_synchronization
     Write - Uint32
-    
+
 
 .EXAMPLE 1
 

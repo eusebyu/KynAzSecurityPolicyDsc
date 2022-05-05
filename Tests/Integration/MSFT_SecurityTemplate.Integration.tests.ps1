@@ -1,5 +1,5 @@
 
-$script:DSCModuleName    = 'SecurityPolicyDsc'
+$script:DSCModuleName    = 'AzSecurityPolicyDsc'
 $script:DSCResourceName  = 'MSFT_SecurityTemplate'
 
 #region HEADER
@@ -46,7 +46,7 @@ try
             Import-Module $dscModulePath
             $testResult = Test-TargetResource -Path $tempFile -IsSingleInstance Yes
 
-            $testResult | Should be $true 
+            $testResult | Should be $true
         }
     }
     #endregion

@@ -10,13 +10,14 @@ $accountPolicies = @{
 
 configuration MSFT_AccountPolicy_config {
 
-    Import-DscResource -ModuleName 'SecurityPolicyDsc'
+    Import-DscResource -ModuleName 'AzSecurityPolicyDsc'
 
     node localhost {
 
-        AccountPolicy Integration_Test 
+        AccountPolicy Integration_Test
         {
             Name = 'IntegrationTest'
+            Deviation = 'Enabled'
             Enforce_password_history = $accountPolicies.Enforce_password_history
             Maximum_Password_Age = $accountPolicies.Maximum_Password_Age
             Minimum_Password_Age = $accountPolicies.Minimum_Password_Age
@@ -24,5 +25,7 @@ configuration MSFT_AccountPolicy_config {
             Password_must_meet_complexity_requirements = $accountPolicies.Password_must_meet_complexity_requirements
             Store_passwords_using_reversible_encryption = $accountPolicies.Store_passwords_using_reversible_encryption
         }
+
+
     }
 }

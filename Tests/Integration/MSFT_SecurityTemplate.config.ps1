@@ -17,17 +17,17 @@ signature="`$CHICAGO`$"
 Revision=1
 "@
 
-$tempFile = ([system.IO.Path]::GetTempFileName()).Replace('tmp','inf') 
+$tempFile = ([system.IO.Path]::GetTempFileName()).Replace('tmp','inf')
 Out-File -InputObject $infTemplate -FilePath $tempFile -Encoding unicode
 
 # Integration Test Config Template Version: 1.0.0
 
 configuration MSFT_SecurityTemplate_config {
 
-    Import-DscResource -ModuleName SecurityPolicyDsc
+    Import-DscResource -ModuleName AzSecurityPolicyDsc
 
     node localhost {
-    
+
         SecurityTemplate Integration_Test
         {
             Path = $tempFile

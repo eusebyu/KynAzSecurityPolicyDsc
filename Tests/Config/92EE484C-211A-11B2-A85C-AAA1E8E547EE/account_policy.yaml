@@ -1,0 +1,14 @@
+Enforce_password_history: 12
+Maximum_Password_Age: 90
+Minimum_Password_Age: 1
+Minimum_Password_Length: 14
+Password_must_meet_complexity_requirements: Enabled
+Store_passwords_using_reversible_encryption: Disabled
+Account_lockout_duration: 5
+Account_lockout_threshold: 20
+Reset_account_lockout_counter_after: 10
+Enforce_user_logon_restrictions: Disabled
+Maximum_lifetime_for_service_ticket: 20
+Maximum_lifetime_for_user_ticket: 10
+Maximum_lifetime_for_user_ticket_renewal: 10
+Maximum_tolerance_for_computer_clock_synchronization: 10
