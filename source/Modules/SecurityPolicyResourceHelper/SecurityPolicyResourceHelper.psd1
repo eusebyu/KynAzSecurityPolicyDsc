@@ -73,7 +73,7 @@ FunctionsToExport = 'Add-PolicyOption', 'ConvertFrom-SDDLDescriptor',
                'ConvertTo-LocalFriendlyName', 'ConvertTo-NTAccount',
                'ConvertTo-SDDLDescriptor', 'ConvertTo-Sid', 'Get-LocalizedData',
                'Get-SecurityPolicy', 'Get-UserRightConstant', 'Get-UserRightsAssignment',
-               'Invoke-Secedit', 'Test-IdentityIsNull', 'Get-HardeningData', 'ConvertTo-Parameter'
+               'Invoke-Secedit', 'Test-IdentityIsNull', 'ConvertTo-Parameter'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
